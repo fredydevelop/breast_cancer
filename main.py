@@ -17,7 +17,6 @@ from tensorflow.keras.preprocessing.image import img_to_array
 from tensorflow.image import resize
 from tensorflow.keras.models import load_model, save_model
 from PIL import Image
-from skimage.transform import resize
 import numpy as np
 from tensorflow.keras.callbacks import EarlyStopping
 
