@@ -19,6 +19,7 @@ from tensorflow.keras.models import load_model, save_model
 from PIL import Image
 from skimage.transform import resize
 import numpy as np
+from tensorflow.keras.callbacks import EarlyStopping
 
 col1, col2 = st.columns(2)
 
