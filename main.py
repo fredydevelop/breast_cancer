@@ -39,27 +39,21 @@ def insert():
 
     if uploaded_file is not None:
         # Convert the uploaded image to RGB
-        img = Image.open(uploaded_file).convert("L")   # convert to grayscale
+        img = Image.open(uploaded_file).convert("L")   # grayscale
+        img = np.array(img)                            # shape: (H, W)
+
+        img = np.expand_dims(img, axis=-1)             # shape: (H, W, 1)
+    
+        resize_img = tf.image.resize(img, (256, 256))  # now valid
+    
+        img_array = np.expand_dims(resize_img, axis=0) # shape: (1, 256, 256, 1)
+        img_array = img_array / 255.0
         
-        img = np.array(img)                            # convert to numpy
-        
-        resize_img = resize(img, (256,256))            # resize
-
-        # Convert the resized image to an array
-        img_array = img_to_array(resize_img)
-        img_array = np.expand_dims(img_array, axis=0)  # Add a batch dimension
-
-        # Make a copy of the array and then rescale
-        img_array_copy = img_array.copy()
-        img_array_copy /= 255.0  # Rescale to values between 0 and 1
-
-
         # To load the model
-
         loaded_model = tf.keras.models.load_model("breast_cancer_checkpoint.keras")        # Make the prediction
         
         if st.button("Predict"):
-            prediction = loaded_model.predict(img_array_copy)
+            prediction = loaded_model.predict(img_array)
         
             predicted_class = np.argmax(prediction)
 
