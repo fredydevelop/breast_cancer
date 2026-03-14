@@ -16,92 +16,22 @@ from PIL import Image
 from tensorflow.keras.preprocessing.image import img_to_array
 from tensorflow.image import resize
 from tensorflow.keras.models import load_model, save_model
-
+from PIL import Image
+from skimage.transform import resize
+import numpy as np
 
 col1, col2 = st.columns(2)
 
 with col1:
-    st.header("PNEUMWARE  Xray-Classification")
-    st.image("MMJXray.jpg",width=80)
-
-
-def sort_extension():
-    
-    data_dir = '/content/Dataset/data'
-    image_exts = ['jpeg','jpg', 'bmp', 'png']
-    for image in os.listdir(data_dir):
-        image_path = os.path.join(data_dir,image)
-    try:
-        img = cv2.imread(image_path)
-        tip = imghdr.what(image_path)
-        if tip not in image_exts:
-            print('Image not in ext list {}'.format(image_path))
-            os.remove(image_path)
-    except Exception as e:
-        print('Issue with image {}'.format(image_path))
-
-
-def saving_into_dataFrame():
-    #saving the file into a dataframe
-
-    filenames = os.listdir('/content/Dataset/data')
-
-    categories = []
-    choosen_filename=[]
-    for filename in filenames:
-        category = filename.split('.')[0]
-        if 'card' in category.lower():
-            categories.append(0)
-            choosen_filename.append(filename)
-        elif 'met' in category.lower():
-            categories.append(1)
-            choosen_filename.append(filename)
-        elif 'paper' in category.lower():
-            categories.append(2)
-            choosen_filename.append(filename)
-        elif 'plas' in category.lower():
-            categories.append(3)
-            choosen_filename.append(filename)
-
-    print(len(choosen_filename), len(categories))
-    df = pd.DataFrame({'filename': choosen_filename, 'category': categories,})
-
-
-
-# def download_and_save_image(image_url, save_path="downloaded_image.png"):
-#     response = requests.get(image_url)
-
-#     if response.status_code == 200:
-#         image_data = BytesIO(response.content)
-#         img = Image.open(image_data)
-#         saved_img_path="./"+save_path
-#         img.save(saved_img_path)
-#         st.success("Image downloaded and saved successfully.")
-#     else:
-#         st.error(f"Failed to download the image. Status code: {response.status_code}")
-
-
-# import requests
-# import streamlit as st
-# from PIL import Image
-# from tensorflow.keras.preprocessing.image import img_to_array
-# from tensorflow.image import resize
-# from tensorflow.keras.models import load_model
-# import numpy as np
-# from io import BytesIO
-
-
-
-
-
-
+    st.header("Breast Cancer Detection")
+    #st.image("MMJXray.jpg",width=80)
 
 
 
 
 
 def insert():
-    st.header("Upload Image to Classify")
+    st.header("Upload Image to detect ")
     
 
     # File uploader widget
@@ -109,11 +39,11 @@ def insert():
 
     if uploaded_file is not None:
         # Convert the uploaded image to RGB
-        img = Image.open(uploaded_file).convert("RGB")
-        # Resize the image using TensorFlow
-        #resize_img = resize(img, (1822,1275))
-        resize_img = resize(img, (150,150))
-
+        img = Image.open(uploaded_file).convert("L")   # convert to grayscale
+        
+        img = np.array(img)                            # convert to numpy
+        
+        resize_img = resize(img, (256,256))            # resize
 
         # Convert the resized image to an array
         img_array = img_to_array(resize_img)
@@ -125,7 +55,7 @@ def insert():
 
 
         # To load the model
-        loaded_model = load_model("n.h5")
+        loaded_model = load_model("breast_cancer_checkpoint.keras")
         # Make the prediction
         
         if st.button("Predict"):
@@ -134,28 +64,23 @@ def insert():
             predicted_class = np.argmax(prediction)
 
             # Map the class label to its corresponding category
-            class_labels = {0: 'Normal', 1: 'Bacteria', 2: 'Virus'}
+            class_labels = {0: 'malignant', 1: 'benign'}
             predicted_category = class_labels[predicted_class]
 
             
             st.write(prediction)
-            if predicted_category == "Normal":
-                result=f"The Xray result is {predicted_category}, there is no issue with this Patient"
-                # Print the prediction
+            if predicted_category == "malignant":
+                result = f"The X-ray result is {predicted_category}. This indicates a cancerous condition and requires immediate medical attention."
+                st.error(result)
+                st.image(img)
+            
+            elif predicted_category == "benign":
+                result = f"The X-ray result is {predicted_category}. This indicates a non-cancerous condition."
                 st.success(result)
-                st.image(img, caption=None)
-            elif predicted_category == "Bacteria":
-                result=f"The Xray result is {predicted_category}, this Patient has a Bacteria Pneumonia Sickness"
-                # Print the prediction
-                st.success(result)
-                st.image(img, caption=None)
-            elif predicted_category == "Virus":
-                result=f"The Xray result is a {predicted_category}, this Patient has Virus Pneumonia"
-                # Print the prediction
-                st.success(result)
-                st.image(img, caption=None)
+                st.image(img)
+            
             else:
-                print()
+                st.warning("Unable to determine the result. Please upload a valid X-ray image.")
            
 
 
