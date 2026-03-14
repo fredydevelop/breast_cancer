@@ -56,8 +56,8 @@ def insert():
 
 
         # To load the model
-        loaded_model = load_model("breast_cancer_checkpoint.keras")
-        # Make the prediction
+
+        loaded_model = tf.keras.models.load_model("breast_cancer_checkpoint.keras")        # Make the prediction
         
         if st.button("Predict"):
             prediction = loaded_model.predict(img_array_copy)
