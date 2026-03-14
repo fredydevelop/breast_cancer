@@ -54,33 +54,38 @@ def insert():
         
         if st.button("Predict"):
             prediction = loaded_model.predict(img_array)
+            
+            predicted_class = np.argmax(prediction, axis=1)[0]
         
-            predicted_class = np.argmax(prediction)
-
-            # Map the class label to its corresponding category
             class_labels = ['benign', 'malignant']
             predicted_category = class_labels[predicted_class]
-
-            
-            st.write(prediction)
+        
+            confidence = float(prediction[0][predicted_class]) * 100
+        
+            st.write("Raw prediction:", prediction)
+        
             if predicted_category == "malignant":
-                result = f"The X-ray result is {predicted_category}. This indicates a cancerous condition and requires immediate medical attention."
+                result = (
+                    f"The model predicts {predicted_category} "
+                    f"with {confidence:.2f}% confidence. "
+                    f"This may indicate a cancerous condition. "
+                    f"Please consult a medical professional."
+                )
                 st.error(result)
                 st.image(img)
-            
+        
             elif predicted_category == "benign":
-                result = f"The X-ray result is {predicted_category}. This indicates a non-cancerous condition."
+                result = (
+                    f"The model predicts {predicted_category} "
+                    f"with {confidence:.2f}% confidence. "
+                    f"This may indicate a non-cancerous condition."
+                )
                 st.success(result)
                 st.image(img)
-            
+        
             else:
                 st.warning("Unable to determine the result. Please upload a valid X-ray image.")
-           
-
-
-
-
-
+        
 
 # def all_predict():
 #     st.title("Upload item to predict")
