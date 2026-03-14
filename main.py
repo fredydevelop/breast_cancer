@@ -58,7 +58,7 @@ def insert():
             predicted_class = np.argmax(prediction)
 
             # Map the class label to its corresponding category
-            class_labels = {0: 'malignant', 1: 'benign'}
+            class_labels = ['benign', 'malignant']
             predicted_category = class_labels[predicted_class]
 
             
