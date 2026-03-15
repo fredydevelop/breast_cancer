@@ -32,7 +32,7 @@ with col1:
 
 
 def insert():
-    st.header("Upload Image to detect ")
+    st.write("Upload Image to detect ")
     
 
     # File uploader widget
