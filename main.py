@@ -39,31 +39,23 @@ def insert():
     uploaded_file = st.file_uploader("", type=["jpg", "jpeg", "png","bmp"], key="upl")
 
     if uploaded_file is not None:
-    
-        # Open image as RGB
         img = Image.open(uploaded_file).convert("RGB")
+        img = np.array(img, dtype=np.float32)      # (H, W, 3)
+        img_array = np.expand_dims(img, axis=0)    # (1, H, W, 3)
     
-        img = np.array(img)                     # shape: (H, W, 3)
-    
-        resize_img = tf.image.resize(img, (256, 256))
-    
-        img_array = np.expand_dims(resize_img, axis=0)   # shape: (1, 256, 256, 3)
-    
-        img_array = img_array / 255.0
-        # To load the model
-        loaded_model = tf.keras.models.load_model("new_breastcancer_model.keras")        # Make the prediction
-        
+        loaded_model = tf.keras.models.load_model("new_breastcancer_model.keras")
+
         if st.button("Predict"):
             prediction = loaded_model.predict(img_array, verbose=0)
-        
+    
             predicted_class = np.argmax(prediction, axis=1)[0]
             class_labels = ['benign', 'malignant']
             predicted_category = class_labels[predicted_class]
             confidence = float(prediction[0][predicted_class]) * 100
-        
-            st.image(img, caption="Uploaded image")
+    
+            st.image(img.astype("uint8"), caption="Uploaded image")
             st.write("Raw prediction:", prediction)
-        
+    
             if predicted_category == "malignant":
                 st.error(
                     f"The model predicts {predicted_category} with {confidence:.2f}% confidence. "
@@ -74,8 +66,6 @@ def insert():
                     f"The model predicts {predicted_category} with {confidence:.2f}% confidence. "
                     f"This may indicate a non-cancerous condition."
                 )
-
-
 # def all_predict():
 #     st.title("Upload item to predict")
 #     # File uploader widget
