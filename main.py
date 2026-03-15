@@ -39,17 +39,17 @@ def insert():
     uploaded_file = st.file_uploader("", type=["jpg", "jpeg", "png","bmp"], key="upl")
 
     if uploaded_file is not None:
-        # Convert the uploaded image to RGB
-        img = Image.open(uploaded_file).convert("L")   # grayscale
-        img = np.array(img)                            # shape: (H, W)
-
-        img = np.expand_dims(img, axis=-1)             # shape: (H, W, 1)
     
-        resize_img = tf.image.resize(img, (256, 256))  # now valid
+        # Open image as RGB
+        img = Image.open(uploaded_file).convert("RGB")
     
-        img_array = np.expand_dims(resize_img, axis=0) # shape: (1, 256, 256, 1)
+        img = np.array(img)                     # shape: (H, W, 3)
+    
+        resize_img = tf.image.resize(img, (256, 256))
+    
+        img_array = np.expand_dims(resize_img, axis=0)   # shape: (1, 256, 256, 3)
+    
         img_array = img_array / 255.0
-        
         # To load the model
         loaded_model = tf.keras.models.load_model("new_breastcancer_model.keras")        # Make the prediction
         
