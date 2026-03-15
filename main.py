@@ -54,39 +54,27 @@ def insert():
         loaded_model = tf.keras.models.load_model("new_breastcancer_model.keras")        # Make the prediction
         
         if st.button("Predict"):
-            prediction = loaded_model.predict(img_array)
-            
-            predicted_class = np.argmax(prediction, axis=1)[0]
+            prediction = loaded_model.predict(img_array, verbose=0)
         
+            predicted_class = np.argmax(prediction, axis=1)[0]
             class_labels = ['benign', 'malignant']
             predicted_category = class_labels[predicted_class]
-        
             confidence = float(prediction[0][predicted_class]) * 100
         
+            st.image(img, caption="Uploaded image")
             st.write("Raw prediction:", prediction)
         
             if predicted_category == "malignant":
-                result = (
-                    f"The model predicts {predicted_category} "
-                    f"with {confidence:.2f}% confidence. "
-                    f"This may indicate a cancerous condition. "
-                    f"Please consult a medical professional."
+                st.error(
+                    f"The model predicts {predicted_category} with {confidence:.2f}% confidence. "
+                    f"This may indicate a cancerous condition. Please consult a medical professional."
                 )
-                st.error(result)
-                st.image(img)
-        
-            elif predicted_category == "benign":
-                result = (
-                    f"The model predicts {predicted_category} "
-                    f"with {confidence:.2f}% confidence. "
+            else:
+                st.success(
+                    f"The model predicts {predicted_category} with {confidence:.2f}% confidence. "
                     f"This may indicate a non-cancerous condition."
                 )
-                st.success(result)
-                st.image(img)
-        
-            else:
-                st.warning("Unable to determine the result. Please upload a valid X-ray image.")
-        
+
 
 # def all_predict():
 #     st.title("Upload item to predict")
