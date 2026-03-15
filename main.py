@@ -24,7 +24,7 @@ col1, col2 = st.columns(2)
 
 with col1:
     st.header("Breast Cancer Detection")
-    #st.image("MMJXray.jpg",width=80)
+    st.image("clarascan_logo.jpg",width=80)
 
 
 
